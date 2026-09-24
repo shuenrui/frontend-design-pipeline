@@ -11,13 +11,14 @@ This file is the pin list. Update it in the same commit as any skill sync.
 ## Installed skills this pipeline depends on
 
 Pinned as recorded on 2026-09-24. Local installs are plain directories, not git
-checkouts, so the commit below is the upstream state each copy was taken from.
+checkouts, so each entry is the upstream commit, or the npm/engine release for
+installed artifacts, that the local copy was taken from.
 
 | Skill | Upstream | Pinned at | Status |
 | --- | --- | --- | --- |
 | `frontend-design-pipeline` | this repo | — | local |
 | `frontend-design` | `anthropics/skills` · `skills/frontend-design/` | `41bbe19` (2026-09-03) | synced |
-| `impeccable` | `pbakaus/impeccable` | `e0881d2` (2026-09-22) | **behind — see blocker** |
+| `impeccable` | `pbakaus/impeccable` | engine `0.1.5`, CLI `impeccable@4.1.0` (2026-09-24) | synced via installer |
 | `design-taste-frontend` | `leonxlnx/taste-skill` | not verified | unaudited |
 | `gpt-taste`, `high-end-visual-design`, `minimalist-ui`, `industrial-brutalist-ui`, `image-to-code`, `imagegen-frontend-web`, `imagegen-frontend-mobile`, `brandkit`, `stitch-design-taste`, `redesign-existing-projects`, `full-output-enforcement`, `design-taste-frontend-v1` | `leonxlnx/taste-skill` | not verified | unaudited |
 | `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | npm `ui-ux-pro-max-cli@2.15.0` | current |
@@ -26,27 +27,55 @@ checkouts, so the commit below is the upstream state each copy was taken from.
 | `emil-design-eng` | `emilkowalski/skills` · `skills/emil-design-eng/` | `d16ebe6` (2026-09-23) | added |
 | `mobile-native` | `emilkowalski/skills` · `skills/mobile-native/` | `d16ebe6` (2026-09-23) | added |
 
-## Blocker: `impeccable` cannot be file-synced
+## Updating impeccable
 
-Upstream `e0881d2` changed runtime architecture. It is not a compatible
-in-place refresh.
+Do not copy files into an impeccable install. Upstream ships an installer that
+writes provider-specific builds and fetches a matching engine binary; a manual
+copy produces a tree the launcher cannot run.
 
-| | Local now | Upstream `e0881d2` |
+```bash
+npx impeccable@latest update
+# or re-install for specific harnesses:
+npx impeccable@latest install --providers=claude,agents,qoder --scope=global --force
+```
+
+`--providers` accepts the harness folders this pipeline assumes: `claude` →
+`~/.claude/skills`, `agents` → `~/.agents/skills`, `qoder` → `~/.qoder/skills`.
+Each receives a different build (57 files for `.agents`, 52 for `.claude` and
+`.qoder`) — those counts differing is correct, not drift. Confirm after any
+update that the engine answers and the detector runs:
+
+```bash
+~/.agents/skills/impeccable/scripts/impeccable engine-probe   # -> impeccable-engine <version>
+~/.agents/skills/impeccable/scripts/impeccable detect --json <some-file>
+```
+
+### History: the 2026-09-24 architecture break
+
+Before this pipeline pinned anything, `impeccable` was a Node skill: it ran
+`node scripts/context.mjs` and carried a 107-file `.mjs` tree including the
+anti-pattern detector. Upstream replaced that with a compiled engine.
+
+| | before | after |
 | --- | --- | --- |
-| Scripts | 107 files | 11 files |
-| Setup entry | `node scripts/context.mjs` | `scripts/impeccable context` (sh launcher) |
-| Engine | `.mjs` sources in the skill dir | compiled per-OS binary, fetched on first run |
-| `SKILL.md` | 10,401 B | 11,868 B (`.agents`), 12,115 B (`.claude`) |
+| Scripts | 107 `.mjs` files | 11 files + per-OS binary |
+| Setup entry | `node scripts/context.mjs` | `scripts/impeccable context` |
+| Detector | `.mjs` sources in the skill dir | engine binary, `…/scripts/bin/<os>-arch/` |
+| Copies | 3 diverged trees (152 / 147 / 147 files) | 3 provider builds from one command |
 
-Overwriting the local tree with upstream files would delete every `.mjs` script
-this install calls, including the anti-pattern detector and the hook that
-Stage 5 depends on, and leave a launcher with no binary. Upgrading means
-adopting upstream's release channel — installing a compiled native executable
-— which is a separate decision from a documentation refresh.
+The local copies had also silently diverged from each other, with no
+provenance file to reveal it. A hand-copy of upstream `SKILL.md` at that point
+would have documented commands the local scripts did not implement, and a
+recursive copy of the upstream tree would have deleted the detector. Both were
+avoided only because the file counts were compared first — which is the reason
+this section exists.
 
-Until that happens: keep the local `impeccable`, and do not "just copy
-`SKILL.md`", because the newer prose documents commands the local scripts do
-not implement.
+The install ran with `--no-hooks`, so the detector is not wired to fire
+automatically on UI edits; the skill falls back to a manual `detect` pass, which
+it announces via `MANUAL_DETECTOR_REQUIRED`. Add hook manifests later with
+`npx impeccable@latest install` without `--no-hooks` if you want it automatic.
+The engine binary is fetched from GitHub releases and verified against a
+`.sha256` sidecar, failing closed when the sidecar or a hasher is unavailable.
 
 ## Vendoring rule
 
