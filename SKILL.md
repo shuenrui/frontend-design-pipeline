@@ -1,6 +1,6 @@
 ---
 name: frontend-design-pipeline
-description: Mandatory coordinator for frontend design work. Use before creating, redesigning, reviewing, polishing, or visually changing websites, landing pages, product UI, dashboards, data viz, components, forms, responsive layouts, native/mobile/desktop UI, or design systems. Orchestrates Impeccable, Anthropic frontend-design, the Leonxlnx Taste skills, and the ui-ux-pro-max design-system data engine without conflicting aesthetics or duplicate workflows.
+description: Mandatory coordinator for frontend design work. Use before creating, redesigning, reviewing, polishing, or visually changing websites, landing pages, product UI, dashboards, data viz, components, forms, responsive layouts, native/mobile/desktop UI, motion, or design systems. Orchestrates Impeccable, Anthropic frontend-design, the Leonxlnx Taste skills, and the ui-ux-pro-max design-system data engine, and routes optional motion, mobile-feel, and shadcn/ui specialists, without conflicting aesthetics or duplicate workflows.
 compatibility: opencode
 metadata:
   audience: frontend-engineers
@@ -35,7 +35,8 @@ Resolve every conflict in this order:
 5. The owning Impeccable playbook and the committed direction for this surface.
 6. Anthropic `frontend-design` as the art-direction and self-critique lens.
 7. The applicable parts of `design-taste-frontend` and any explicitly routed
-   Taste specialist as implementation guidance or anti-slop lint.
+   Taste, motion, or mobile-feel specialist as implementation guidance or
+   anti-slop lint.
 8. `ui-ux-pro-max` generated systems and looked-up data (palettes, type
    pairings, tokens, chart picks, UX/accessibility rules, stack guidance) as
    structured recommendations.
@@ -221,6 +222,40 @@ Load at most one output/workflow specialist:
 
 The five output/workflow specialists above are mutually exclusive.
 
+Load at most one motion/interaction specialist:
+
+| Skill | Load only when |
+| --- | --- |
+| `apple-design` | The surface has gesture-driven or physics-bearing interaction: drag, swipe, sheets, carousels, pull-to-refresh, momentum dismissal, interruptible transitions, spring settle, or translucent-material depth. It supplies spring parameters (damping/response), velocity handoff, momentum projection, and rubber-banding that no other skill carries. Not for static or content-only surfaces. |
+| `emil-design-eng` | A component needs interaction polish at the CSS level: enter/exit easing choice, duration, `:active` feedback, origin-aware popovers, tooltip timing, `@starting-style`, or masking a weak transition. It owns the concrete motion-implementation rules and the Before/After review table. Not for direction selection. |
+| `mobile-native` | The deliverable runs in a mobile browser and must feel installed: sticky hover after tap, tap-highlight flash, `100vh` height bug, input zoom, tap latency, pull-to-refresh hijack, safe-area/notch content, long-press text selection, horizontal carousels. Its symptom table is the owner for these; `ui-ux-pro-max --domain ux` stays the source for accessibility targets and safe-area rules generally. |
+
+These three address different layers and are not mutually exclusive with each
+other: choose the one matching the dominant risk, or none. `apple-design` is
+about interaction behavior over time, `emil-design-eng` about per-component CSS
+craft, `mobile-native` about platform defects. A surface needing all three is
+rare; if genuinely required, load the one for the current pass and finish
+before moving on.
+
+All three are subordinate to Impeccable's `animate.md` motion thesis. They
+supply implementation rules and parameters; they never authorize motion the
+locked direction and budget did not earn, and they never override a
+project's existing motion library or reduced-motion handling.
+
+`emil-design-eng` mandates a Before/After markdown table when reviewing UI code.
+Adopt that format for motion and polish findings, but it does not create a
+separate review pass — fold the table into Impeccable's single finish pass.
+
+## Optional component-library reference
+
+When the project uses shadcn/ui, `ui-styling` is the owner and its
+`references/upstream-shadcn/` tree (a vendored copy of the official
+`shadcn-ui/ui` skill) is authoritative over any summary in this pipeline or in
+`ui-ux-pro-max`'s stack data. Read the project's primitive base with
+`npx shadcn@latest info` before writing component code; it may be Base UI,
+Radix, or React Aria, and custom triggers differ between them (`asChild` vs
+`render`). Do not assume Radix.
+
 Other Taste helpers:
 
 - `ui-ux-pro-max` is a core data engine, not an aesthetic specialist, so it
@@ -256,7 +291,10 @@ playbook directs. Then:
 - Build responsive behavior intentionally for mobile, intermediate, and wide
   viewports; do not assume desktop CSS will collapse correctly.
 - Keep motion purposeful and bounded. It must communicate hierarchy, feedback,
-  state, or story.
+  state, or story. Where the surface has gesture-driven or physics-bearing
+  interaction, or a component needs motion/easing/duration craft, pull the
+  concrete parameters from the one routed motion specialist instead of
+  inventing curves; see Optional Taste routing.
 - Pull concrete implementation guidance from `ui-ux-pro-max` as needed:
   `--domain ux` for accessibility and interaction rules, `--domain chart` for
   data-viz selection, `--domain icons` for accessible icon usage, `--domain
@@ -305,6 +343,19 @@ when it violates the brief, approved direction, or established system.
   direction decide.
 - Motion everywhere versus restraint: user value, performance, and reduced
   motion decide. Never animate to satisfy a dial.
+- Motion duration and easing when Impeccable's `animate.md` and a motion
+  specialist disagree: `animate.md` owns the budget and whether motion exists
+  at all; the specialist owns the specific curve, spring parameters, and
+  component-level timings inside that budget. A specialist's faster or slower
+  default never expands Impeccable's budget.
+- Spring versus duration-based transition: springs for anything the user can
+  touch, drag, or interrupt; CSS transitions/keyframes for bounded state changes
+  with no interruption risk, and where the project's motion library cannot
+  express springs. Follow the existing stack first.
+- Primitive base for shadcn/ui components: `npx shadcn@latest info` and
+  `references/upstream-shadcn/rules/base-vs-radix.md` decide. Assuming Radix
+  because shadcn historically shipped on it is wrong; the current default is
+  Base UI.
 - Double-bezel containers versus no nested cards: the committed material system
   and real hierarchy decide; blanket enclosure recipes lose.
 - Dual theme versus one locked theme: project requirements and actual use scene
@@ -321,5 +372,6 @@ when it violates the brief, approved direction, or established system.
   specialists, which disclaim these surfaces.
 
 At handoff, state which core skills (Impeccable, frontend-design, Taste,
-ui-ux-pro-max) and optional specialist were used, what each contributed, and
-which conflicting rules were deliberately suppressed. Keep the report concise.
+ui-ux-pro-max) and which optional specialist — aesthetic, output/workflow,
+motion, or mobile-feel — were used, what each contributed, and which
+conflicting rules were deliberately suppressed. Keep the report concise.
