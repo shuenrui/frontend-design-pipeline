@@ -100,9 +100,33 @@ discovered.
 
 ## Files
 
-- `SKILL.md` — the coordinator (authority order, skill roles, 5 stages, routing,
-  conflict rules).
+- `SKILL.md` — the router, and the only file loaded for every task: authority
+  order, the four core skill roles, the five stages, and the specialist routing
+  tables. It stays small on purpose because it is read on every frontend task.
+- `reference/` — stage-scoped detail loaded only when its trigger fires:
+  `loading-budget.md`, `intake.md`, `component-library.md`, `imagery.md`,
+  `detector-trust.md`, `conflicts.md`. Each is linked from the stage that needs
+  it, so an agent that never touches shadcn or generated imagery never pays for
+  those pages.
 - `bootstrap.md` — optional instruction snippet that forces the pipeline to load
   first.
-- `PROVENANCE.md` — upstream pin list, the `impeccable` sync blocker, vendoring
-  rule, and the criteria (and rejections) used when evaluating new skills.
+- `PROVENANCE.md` — upstream pin list, the impeccable migration record, the
+  vendoring rule, and the criteria (and rejections) used when evaluating new
+  skills.
+
+### Progressive disclosure
+
+The coordinator routes; it does not carry every rule inline. Moving detail into
+`reference/` is what lets the pipeline gain intake consolidation, detector
+calibration, and imagery policy without growing the always-loaded file. If you
+add a rule, ask whether every task needs it in context. If not, it belongs in
+`reference/` with a link from its stage.
+
+Generated imagery has no dependency to install. A skill cannot generate an
+image and cannot drive another CLI into generating one — it is instructions with
+no runtime and no credentials. The executing agent generates through whatever the
+host exposes (a native image tool, a configured MCP server, or a shell API call
+with a key already in the environment), and `reference/imagery.md` defines that
+resolution order plus the fallback when the harness has no image route at all.
+A coding-agent CLI such as `codex` accepts images as input (`-i, --image`) but is
+not itself a generator.
