@@ -16,9 +16,48 @@ unauthorized, or the request is a trivial one-off where the latency and token
 cost are not justified.
 
 ```bash
-codex exec --skip-git-repo-check --sandbox workspace-write \
+codex exec --skip-git-repo-check --sandbox workspace-write -C <project-dir> \
+  -o /tmp/codex-img.txt \
   "Generate an image with your built-in image_gen tool: <brief>. \
-   Save it to <absolute project path>/<name>.png and report the filename."
+   Save it as <name>.png in the working directory and report the filename."
+```
+
+Verified interface details, each of which caused a failed attempt before it was
+written down:
+
+- **Interaction is a subprocess, not a session.** The agent shells out to
+  `codex exec`, Codex runs headless with its own context and its own sandbox,
+  and the agent gets stdout back. There is no MCP server involved and no chat
+  handoff. The artifact crosses the boundary as a **file path**, never as bytes.
+- **Global options precede the `resume`/`fork` subcommands.** `codex exec resume
+  --last ...` fails on argument parsing; `codex exec --skip-git-repo-check
+  resume --last "..."` works. Options placed after the prompt are read as extra
+  positionals and error out.
+- **Always pass `-o <file>`** and read that file, rather than letting the
+  transcript stream into the session. It writes only the agent's final message,
+  which keeps the ~18k-token generation out of the orchestrating context.
+- **`-C <dir>` sets the working root**, so the image can be saved by relative
+  name; it also keeps Codex out of unrelated project files.
+- **Iterate with `resume --last`.** It retains the session, so a follow-up can
+  be one sentence ("warmer light, no text in the image") instead of re-sending
+  the entire brief. For a fresh branch of the same idea use `fork`.
+- **`-i/--image` attaches a reference image** to a new prompt — useful for
+  keeping a shot list visually consistent once one image in the series is
+  approved. It is input only; it is not how generation happens.
+- Sandbox choices are `read-only`, `workspace-write`, `danger-full-access`.
+  Use `workspace-write` for saving files. `danger-full-access` and
+  `--dangerously-bypass-approvals-and-sandbox` are not needed for image work and
+  should not be used to get around a failure — the failure is almost always the
+  read-only default or a missing destination.
+- Expect a call to run minutes, not milliseconds. Do not fire generations
+  one-after-another inside a turn while waiting on each; when several are
+  independent, batch the shot list, run them, then continue once results land.
+
+```bash
+# cheap follow-up on an approved image, same session
+codex exec --skip-git-repo-check --sandbox workspace-write -C <project-dir> \
+  -o /tmp/codex-img2.txt resume --last \
+  "Regenerate with warmer afternoon light. Keep composition identical."
 ```
 
 Three things break if skipped. The default sandbox is read-only, so the image
