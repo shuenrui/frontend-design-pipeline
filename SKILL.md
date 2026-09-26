@@ -166,7 +166,7 @@ boilerplate repeated per finding.
 
 ## Stage 1: classify
 
-Before editing, classify the request on four axes:
+Before editing, classify the request on five axes:
 
 - Work type: new visual world, new surface in an established world, explicit
   redesign, narrow refinement, audit/review, or visual bug fix.
