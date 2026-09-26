@@ -1,6 +1,6 @@
 ---
 name: frontend-design-pipeline
-description: Mandatory coordinator for frontend design work. Use before creating, redesigning, reviewing, polishing, or visually changing websites, landing pages, product UI, dashboards, data viz, components, forms, responsive layouts, native/mobile/desktop UI, motion, or design systems. Orchestrates Impeccable, Anthropic frontend-design, the Leonxlnx Taste skills, and the ui-ux-pro-max design-system data engine, and routes optional motion, mobile-feel, and shadcn/ui specialists, without conflicting aesthetics or duplicate workflows.
+description: Mandatory coordinator for frontend design work. Use before creating, redesigning, reviewing, polishing, or visually changing websites, landing pages, product UI, dashboards, data viz, components, forms, responsive layouts, native/mobile/desktop UI, motion, generated imagery, or design systems. Owns one consolidated intake so downstream flows do not re-ask, orchestrates Impeccable, Anthropic frontend-design, the Leonxlnx Taste skills and the ui-ux-pro-max data engine, routes optional motion, mobile-feel and shadcn specialists, scales ceremony to the delivery shape, and calibrates detector findings against known false-positive classes.
 compatibility: opencode
 metadata:
   audience: frontend-engineers
@@ -49,6 +49,17 @@ owner for each decision. Within `ui-ux-pro-max`, its accessibility, UX, chart,
 and stack data are evidence and rank accordingly; its generated palettes, type
 pairings, and tokens are only candidates and yield to rungs 1-7.
 
+**A user-pinned look overrides every skill's anti-slop list.** When the brief
+names a direction that a skill's banned-defaults list also names — warm cream
+with a serif display and a terracotta accent, near-black with one acid accent,
+broadsheet hairlines, SaaS cards, or anything else a skill treats as a tell —
+the direction stands, and rung 1 is the reason. Escape the cliché in the
+rendition, not the direction: earn it through the subject's own materials, real
+content, spacing, and detail rather than by substituting a different palette the
+skills find more original. Do not silently re-interpret an approved look into a
+less recognizable one, and do not report the pinned direction as a defect. This
+holds whether or not you have read the skill that bans it.
+
 ## Core skill roles
 
 Load the core skills through the skill tool, not by copying their files into the
@@ -63,6 +74,11 @@ setup once per session and load exactly one owning playbook at a time.
 
 Do not run several Impeccable commands as competing passes. An explicit audit
 is report-only unless the user also asks for fixes.
+
+When this pipeline's consolidated intake already captured product truth, treat
+Impeccable's `init` interview as satisfied: write `PRODUCT.md` from the intake
+answers and continue into the owning playbook. `init` is a place to put answers
+you already have, not a reason to ask the user again.
 
 ### Anthropic frontend-design: art director
 
@@ -131,6 +147,30 @@ system, always pass `--output-dir <project-root>`, and never `--force` over an
 existing `MASTER.md` or an Impeccable-owned `DESIGN.md` without explicit
 authorization.
 
+## Reading skill references
+
+Loaded instructions are a budget, not a bonus. Reading three reference files
+before writing any code can cost more than the design work itself, and these
+files are written for humans: line counts lie.
+
+- `wc -l` is not a size estimate. A 322-line reference file can hold ~68 KB
+  because a handful of lines are very long. Check bytes, not lines, before
+  opening a reference wholesale.
+- Load the reference a stage actually needs, and only that one. Impeccable
+  owns one playbook at a time; this pipeline's stages do not need
+  `craft-floor.md` during planning, and loading it early is pure cost.
+- For a long file, read a targeted range or grep for the section you need
+  rather than reading it end to end. A whole-file read that exceeds the tool
+  output cap comes back truncated and forces extra round trips — the
+  expensive failure mode is the re-read, not the read.
+- Prefer `ui-ux-pro-max` script queries over reading its data files: the search
+  script returns the rows you asked for, while reading a CSV loads thousands of
+  lines you will not use.
+- Never load two aesthetic specialists to compare their prose. Route per the
+  tables below and load one.
+- After intake, do not re-read a skill's flow documents to confirm what you are
+  about to do. One pass per owning document per session.
+
 ## Stage 1: classify
 
 Before editing, classify the request on four axes:
@@ -141,11 +181,64 @@ Before editing, classify the request on four axes:
   definitions.
 - Output: runnable code, design/reference images, mobile images, brand board,
   Stitch artifact, or review only.
+- Delivery shape: repository work in an existing project, or a self-contained
+  single-file artifact. See Single-file artifacts.
 - Preservation level: preserve, evolve within the system, or replace with
   explicit approval.
 
 Ask one compact question only when the answer changes scope, product truth, or
 the preserve/replace decision. Otherwise infer from the code and brief.
+
+## One consolidated intake
+
+The pipeline owns exactly one question round per task, at this point, before
+Impeccable's flows run. Impeccable `init` and `new-work` each carry their own
+interview, and `context` blocks until `PRODUCT.md` exists, so an uncoordinated
+run can ask the same product truth two or three times over.
+
+Collect everything the downstream flows will want in one pass, then never ask
+for it again:
+
+- subject, audience, and the single job of the surface;
+- product truth: real names, hours, prices, places, claims, and supplied copy
+  or assets;
+- brand, references, existing tokens, and any look the user explicitly pinned;
+- delivery shape, preservation level, and platform/browser constraints;
+- content that is real, synthetic-but-labelled, or still missing;
+- performance, motion budget, and accessibility target where they matter.
+
+Ask it as one compact grouped question, not a sequence. Then write the answers
+down where the owning flow reads them — `PRODUCT.md` for Impeccable context —
+so the downstream interview is satisfied by the artifact rather than re-run.
+
+When an answer is genuinely unknown, record the inference and label it, then
+continue; do not stop to confirm an assumption the brief already constrains.
+Only re-open intake when new information changes scope, product truth, or the
+preserve/replace decision — that is an escalation, not a second round.
+
+Treat a downstream "run the interview" instruction as already satisfied when
+this stage produced the answers it wanted. Announce that in one line, for
+example: product truth captured at intake; `init` proceeds without re-asking.
+
+## Single-file artifacts
+
+Not every task is a repository. When the deliverable is one self-contained
+file, or a page a user will paste into a sandbox, classify the delivery shape
+as single-file and drop the ceremony that cannot change its output: no build
+tooling, no dev server, no dependency install, no lint/typecheck pass, no
+framework migration, no repo-wide search for a design system that does not
+exist. Inline the styles, keep the file renderable on its own, and record
+tokens at the top so the artifact remains the source of truth.
+
+Verify it by opening the file and exercising the interaction path, not by
+running project pipelines. Stage 5's build/typecheck/lint steps and any
+detector pass are skipped when there is no project for them to run against;
+state that plainly rather than reporting them as passing.
+
+Scale the rest of the flow the same way. For a narrow refinement or a single
+component, concept generation, a design system lookup, and a full finish review
+are cost without leverage — classify in Stage 1 decides. Run the stages that can
+change this task's output and mark the rest not applicable in one line.
 
 ## Stage 2: establish truth
 
@@ -273,6 +366,66 @@ Other Taste helpers:
 If no specialist's trigger is satisfied, load none. More design skills do not
 mean better design.
 
+## Generated imagery
+
+When the committed direction needs an image that does not exist and cannot be
+sourced, generate it. Use whatever image capability the runtime provides — the
+host's image tool, a Codex or other model-backed generator, or a local
+diffusion CLI — and treat the specific model as an environment detail, not a
+pipeline step. Detect what exists; do not assume a generator is available and
+do not fail the task when one is absent.
+
+Imagery is a direction decision, so request it during Stage 3, before code.
+Decide what the image must carry — subject, framing, light, aspect ratio,
+palette relationship, where it sits in the layout — then generate toward that
+brief, rather than generating first and finding a use for the result. Generate
+at the aspect ratio and crop the layout will actually consume; a regenerated
+image is a new composition decision, not a re-run.
+
+Before generating, classify the image's truth claim:
+
+- **Safe to generate.** Original and decorative material: texture, paper grain,
+  ambient light, abstractions of the subject's own world, illustrative motifs,
+  iconography, patterns, empty states, backgrounds, and clearly stylized
+  non-representational art. These express the direction without asserting facts.
+- **Never generate as fact.** Anything that impersonates commercial or product
+  truth: the actual premises, products, food, staff, or customers of a named
+  real business; screenshots of a real interface; real artwork or a live
+  brand's identity; testimonials, press logos, awards, or client work. A
+  convincing generated photograph of a real cafe is a claim that the cafe looks
+  like that, which is fabrication regardless of how well it renders. Reach for
+  supplied assets, or leave an explicit replacement note.
+- **Generate only when labeled.** Placeholders that will ship in view of users
+  as stand-ins for real photography. Label them in the file or the markup, and
+  in the handoff.
+
+A synthetic image inherits this pipeline's existing content rule: real supplied
+content always wins, synthetic must be labeled, and a missing asset is a
+replacement note rather than an invention. Generated imagery never substitutes
+for a product's actual claims.
+
+Technical duties after generating:
+
+- Save into the project's real asset location and reference it by relative
+  path. Never leave a generated file outside the deliverable or reference an
+  absolute scratch path.
+- Provide meaningful `alt`, explicit `width`/`height` or an aspect-ratio box,
+  `loading="lazy"` below the fold, and a `decoding` hint so the image cannot
+  cause layout shift.
+- Preserve the direction's palette relationship. A generated image that fights
+  the token system is a defect in the composition, not a reason to repaint the
+  page.
+- Keep it in budget. For a single-file artifact, an embedded raster inflates the
+  payload; prefer CSS-drawn texture there, and say why when you choose one.
+- Disclose in the handoff which images were generated, by what, and which are
+  awaiting real assets, so a later pass can replace rather than re-generate.
+
+Routing stays as follows: `imagegen-frontend-web` and `imagegen-frontend-mobile`
+own *design-direction comps* — images to review a layout or screen concept.
+`brandkit` owns identity boards and logo systems. Plain asset generation for
+placement inside a page is this section, which needs no aesthetic specialist
+loaded and is not a competing direction.
+
 ## Stage 4: implement
 
 Immediately before UI edits, load Impeccable's craft-floor reference as its
@@ -322,6 +475,52 @@ Use bounded, evidence-based passes:
    document the built system. A narrow extension or polish pass must not rewrite
    DESIGN.md.
 
+### Detector findings are evidence, not verdicts
+
+The Impeccable detector resolves declarations statically. It does not evaluate
+your theme system, and some findings are unreliable enough that acting on them
+uncritically costs more time than skipping the pass.
+
+Trust tiers, from a v0.1.5 reproduction pass:
+
+- **Reproduce before acting — `cramped-padding`.** The detector cannot resolve
+  `clamp()`, `min()`, or `max()`. A container with
+  `padding: clamp(20px, 3vw, 30px)` and a visible border reports *"children
+  flush against border on all sides (no inset)"* even though it is correctly
+  padded at every viewport. Confirmed reproducible. Treat it as a false positive
+  unless the rendered result shows real collision, and say so rather than
+  "fixing" it.
+- **Re-resolve before acting — `low-contrast`.** A reported ratio pairs a
+  foreground and background the detector found, which is not necessarily the
+  pair a user sees. In a themed project, a dark-theme token can be measured
+  against the light ground, or an unused pairing reported while the live one
+  passes. Recompute the ratio for the actual rendered element in the theme the
+  user will see, for both themes when the project ships both, and act only on
+  the pairs that genuinely fail. Do not bulk-fix a contrast list.
+- **Generally sound** — semantics, missing labels, focus-visible absence,
+  duplicated utility patterns, and structural tells.
+
+Cheap ways to cut noise before you triage anything:
+
+```bash
+# scope to the domain you are actually reviewing
+<skill>/scripts/impeccable detect --scope type,layout <targets>
+# suppress advisory-only findings
+<skill>/scripts/impeccable detect --no-advisory <targets>
+# scan the rendered page rather than the source, when a dev server exists
+<skill>/scripts/impeccable detect --viewport 390x844 http://localhost:PORT/
+```
+
+Inline ignore comments (`impeccable-disable`) and project ignore rules are the
+durable way to retire a recurring false positive class; use them instead of
+re-litigating the same finding every run. When a detector category is mostly
+noise on your token setup, verify contrast by measuring computed styles in the
+browser and say which method produced the result.
+
+Report findings in three buckets — true defects fixed, false positives rejected
+with reason, real issues left out of scope — so a future run can calibrate
+against the pass instead of repeating it.
+
 For native/mobile or data-heavy surfaces, cross-check the relevant
 `ui-ux-pro-max --domain ux` outcomes (touch targets, safe areas, dynamic type,
 contrast parity, color-not-sole-indicator) rather than the web-only Taste
@@ -364,6 +563,13 @@ when it violates the brief, approved direction, or established system.
   accessible authored SVG for product-specific geometry when justified.
 - Official design-system package versus current stack: platform contract or an
   explicit brief can require it; visual resemblance cannot.
+- Generated imagery versus product truth: supplied assets win; decorative and
+  abstract original imagery may be generated; an image asserting that a real
+  business, product, or person looks a specific way is fabrication and needs a
+  replacement note, not a render.
+- Ceremony versus delivery shape: a single-file artifact has no build, lint,
+  dev server, or design system to consult. Skipping those checks is correct,
+  reporting them as satisfied is not.
 - `ui-ux-pro-max` generated palette/type/tokens versus existing brand or
   approved comp: the committed direction and existing tokens win; generated
   values are candidates, not overrides.
