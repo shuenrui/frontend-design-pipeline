@@ -23,19 +23,37 @@ exists:
    and an endpoint the user has configured. Test for the credential without
    printing it, e.g. `[ -n "$OPENAI_API_KEY" ] && echo SET`. If unset, this
    route does not exist — do not ask the user for a key mid-design and do not
-   write one into a file.
-4. **Nothing.** Generate no image. Ship the layout with a defined image slot,
+   write one into a file. A subscription login is not an API key: an agent
+   authorized through a plan login can generate without any key in the
+   environment, so an absent key proves nothing about whether generation is
+   available. Check the agent's own auth, not only the shell.
+4. **A second agent CLI that has generation built in.** When the host executing
+   this pipeline has no image tool but the user has a coding-agent CLI installed
+   that does, delegate to it. Codex is a concrete, verified case: its built-in
+   `image_gen` tool works on a ChatGPT plan login with no `OPENAI_API_KEY` set.
+
+   ```bash
+   codex exec --skip-git-repo-check --sandbox workspace-write \
+     "Generate an image with image_gen: <brief>. Save it to <project path>/<file>.png"
+   ```
+
+   Two things break if you skip them. The default sandbox is read-only, so the
+   image is generated but the copy into the project fails — pass
+   `--sandbox workspace-write`. And Codex writes originals into
+   `~/.codex/generated_images/<session-id>/<call-id>.png` before placing them,
+   so name the destination path in the request rather than hunting for the file
+   afterward. Codex also carries an API-key fallback mode; prefer the built-in
+   tool when the user's entitlement is a subscription. Budget for it: a single
+   delegated generation ran ~18k tokens.
+5. **Nothing.** Generate no image. Ship the layout with a defined image slot,
    explicit replacement notes, and the exact prompt you would have used, so the
    user can run it later. A missing image is a documented gap, never a reason
    to stop the build.
 
-A coding-agent CLI is not an image generator. `codex --help` shows `-i, --image
-<FILE>`, which *attaches* input images to a prompt; there is no generation
-primitive. Invoking another agent to produce a file only works because that
-agent independently has one of the four routes above, so going through it adds
-a hop without adding capability. Reach for it only when the user explicitly
-wants that harness to own the image, and never describe the model as
-"unsupported" when the actual finding is "this harness has no image route".
+Do not confuse a CLI's image *input* flag with generation. `-i, --image <FILE>`
+attaches images to a prompt. Whether a CLI can also produce images is a separate
+capability, and some can — establish it by checking the tool's own feature
+surface rather than by reading `--help` and concluding a flag is absent.
 
 Probe quietly and once. Do not enumerate the user's environment out loud, and
 never echo a credential value, length included only when it helps debug.

@@ -128,5 +128,8 @@ no runtime and no credentials. The executing agent generates through whatever th
 host exposes (a native image tool, a configured MCP server, or a shell API call
 with a key already in the environment), and `reference/imagery.md` defines that
 resolution order plus the fallback when the harness has no image route at all.
-A coding-agent CLI such as `codex` accepts images as input (`-i, --image`) but is
-not itself a generator.
+Delegating to another agent CLI is a real route: Codex's built-in `image_gen`
+produces PNGs on a ChatGPT plan login with no `OPENAI_API_KEY` in the
+environment, as long as you pass `--sandbox workspace-write` so it can copy the
+file out of `~/.codex/generated_images/` into your project. Do not read a CLI's
+`-i, --image` input-attachment flag as proof it cannot generate.
