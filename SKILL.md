@@ -114,6 +114,13 @@ override the brief, an existing design system, an approved comp, accessibility,
 or correctness. Do not fabricate metrics, dates, customers, testimonials,
 prices, capabilities, or social proof to make a design look realistic.
 
+This skill is 87 KB and ships monolithic — invoking it loads all of it, which is
+the single largest cost in a run. When one part is what the stage needs, grep its
+numbered headings and read that range by file path instead of loading the skill.
+Reserve the full load for genuinely design-led work: a new visual world, a
+redesign, or a landing or portfolio page where the whole directive set can
+change the output.
+
 ### ui-ux-pro-max: design-system data engine
 
 `ui-ux-pro-max` is not a fourth aesthetic; it is a deterministic, queryable data
@@ -149,10 +156,13 @@ authorization.
 
 ## Loading discipline
 
-Loaded instructions are a budget, not a bonus. Read
-[reference/loading-budget.md](reference/loading-budget.md) before loading a second skill reference in
-one session. Short version: one file per stage, check bytes not lines, and query
-`ui-ux-pro-max` rather than reading its CSVs.
+Loaded instructions are a budget, not a bonus. A fully-loaded new-build run
+costs ~55k tokens before any code, and two files account for 64% of it. Read
+[reference/loading-budget.md](reference/loading-budget.md) for the measured
+table, for the rule against loading the 87 KB Taste skill whole when one
+numbered section is what you need, and for scaling load to the task. Project
+detector JSON rather than reading it raw — over half that payload is the same
+boilerplate repeated per finding.
 
 ## Stage 1: classify
 
@@ -289,11 +299,16 @@ React Aria, and custom triggers differ. Never assume Radix.
 
 ## Imagery
 
-When the direction needs an image that does not exist, load
-[reference/imagery.md](reference/imagery.md) before Stage 3 closes. It resolves
-which image route the harness actually has, classifies the truth claim so
-decorative generation stays allowed and fabricated product imagery does not, and
-sets the alt/size/lazy duties for whatever ships.
+When the direction needs an image, generate it through **Codex** — that is the
+preferred route on this setup for quality, via its built-in `image_gen` tool on
+a ChatGPT plan login, with `--sandbox workspace-write` and the destination path
+named in the request. Load
+[reference/imagery.md](reference/imagery.md) before Stage 3 closes: it has the
+exact invocation, the fallbacks when Codex is unavailable, the truth
+classification that keeps decorative generation allowed and fabricated product
+imagery not, and the alt/size/lazy duties for whatever ships. Confirm the shot
+list before generating anything — each image runs ~18k tokens in Codex's own
+context, which is why delegating is cheaper than generating inline.
 
 ## Stage 4: implement
 

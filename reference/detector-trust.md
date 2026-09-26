@@ -4,6 +4,29 @@ The Impeccable detector resolves declarations statically. It does not evaluate
 your theme system, and some findings are unreliable enough that acting on them
 uncritically costs more time than skipping the pass.
 
+### Never read raw detector JSON into context
+
+`detect --json` spends 53% of its payload repeating the same `description`
+boilerplate for every finding — measured at 628 bytes per finding, so a 111-
+finding pass costs ~17,400 tokens to say what 2,100 tokens would carry. Project
+first, then read details only for the specific rule you are about to act on:
+
+```bash
+<skill>/scripts/impeccable detect --json <targets> 2>/dev/null \
+  | jq -r '.[] | "\(.antipattern)|\(.severity)|L\(.line)|\(.snippet[0:60])"'
+```
+
+Measured on a 9-finding page: 5,685 B raw against 670 B projected — 12% of the
+size for the same triage value. `--quiet` collapses further still, to a count
+plus one line per rule, which is usually enough to decide whether a deeper look
+is warranted at all. Group repeated identical findings rather than listing them:
+four identical `cramped-padding` hits are one defect with four instances.
+
+`--scope <domain>`, `--no-advisory`, and `--viewport` reduce work only when they
+actually exclude something. On a themed test page both `--scope type` and
+`--no-advisory` returned the identical 9 findings, so do not treat them as
+noise controls by reflex — measure the count, then claim the saving.
+
 Trust tiers, from a v0.1.5 reproduction pass:
 
 - **Reproduce before acting — `cramped-padding`.** The detector cannot resolve
